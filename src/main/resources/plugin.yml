@@ -1,0 +1,11 @@
+name: KatsuEngine
+version: '${project.version}'
+main: io.github.maazapan.katsuengine.KatsuEngine
+api-version: 1.16
+softdepend:
+  - Terra
+  - Multiverse-Core
+
+
+commands:
+  katsu:

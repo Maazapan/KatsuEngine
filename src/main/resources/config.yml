@@ -1,0 +1,46 @@
+
+
+config:
+  prefix: "  &8▸ &a✔ &8| #FF1D1D&lKatsu &8:&r "
+
+  integrations:
+    world-guard:
+      enable: true
+
+    terra-generation:
+      enable: false
+      terra-worlds:
+        - "world"
+
+      furniture-models:
+          example_furniture:
+            probability: 100
+            structure_key: katsu_example_furniture
+
+          example_furniture_2:
+            probability: 50
+            structure_key: katsu_example_furniture_2
+cosmetics:
+  hat-cosmetic:
+    example_hat:
+      material: CARVED_PUMPKIN
+      custom_model_data: 1
+      display_name: "&fExample Hat"
+      lore:
+        - "&8KatsuEngine"
+
+furniture:
+
+  # This is example first furniture
+  # you can create more furniture like this.
+  example_furniture:
+    rotate: true
+    furniture-chair:
+      enable: true
+      posY: -1.6
+    itemstack:
+      material: OAK_PLANKS
+      custom_model_data: 1
+      display_name: "&fExample Furniture"
+      lore:
+        - "&8KatsuEngine"

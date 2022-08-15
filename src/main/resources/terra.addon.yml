@@ -1,0 +1,8 @@
+schema-version: 1
+contributors:
+  - Maazapan
+id: katsu-addon
+version: 0.1.0
+entrypoints:
+  - "io.github.maazapan.katsuengine.integrations.terra.KatsuAddon"
+license: MIT License
