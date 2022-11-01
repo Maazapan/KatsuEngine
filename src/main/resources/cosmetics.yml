@@ -1,0 +1,9 @@
+
+cosmetics:
+  example_cosmetic:
+    type: HAT
+    custom_model_data: 1
+    display_name: "&fExample Hat Cosmetic"
+    lore:
+      - '&8KatsuEngine'
+      - ''

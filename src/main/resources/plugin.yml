@@ -1,11 +1,12 @@
 name: KatsuEngine
-version: '${project.version}'
+version: '1.0.1'
 main: io.github.maazapan.katsuengine.KatsuEngine
 api-version: 1.16
 softdepend:
   - Terra
   - Multiverse-Core
-
+  - WorldGuard
+  - ProtocolLib
 
 commands:
   katsu:

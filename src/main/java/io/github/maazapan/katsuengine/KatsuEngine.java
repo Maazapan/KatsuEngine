@@ -1,45 +1,41 @@
 package io.github.maazapan.katsuengine;
 
-import io.github.maazapan.katsuengine.commands.KatsuCommand;
-import io.github.maazapan.katsuengine.engine.cosmetics.hats.manager.HatManager;
-import io.github.maazapan.katsuengine.engine.furniture.manager.FurnitureManager;
-import io.github.maazapan.katsuengine.listener.PlayerListener;
+import io.github.maazapan.katsuengine.engine.block.manager.BlockManager;
+import io.github.maazapan.katsuengine.engine.block.types.furnitures.manager.FurnitureManager;
+import io.github.maazapan.katsuengine.manager.LoaderManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class KatsuEngine extends JavaPlugin {
 
     private static KatsuEngine instance;
 
+    private BlockManager blockManager;
     private FurnitureManager furnitureManager;
-    private HatManager hatManager;
+
+    private LoaderManager loaderManager;
 
     @Override
     public void onEnable() {
-        // Plugin startup logic
         instance = this;
+        blockManager = new BlockManager(this);
         furnitureManager = new FurnitureManager(this);
-        hatManager = new HatManager(this);
-
-        this.saveDefaultConfig();
-        this.getCommand("katsu").setExecutor(new KatsuCommand(this));
-        getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
+        loaderManager = new LoaderManager(this);
     }
 
-    @Override
-    public void onDisable() {
-        // Plugin shutdown logic
-    }
-
-    public HatManager getHatManager() {
-        return hatManager;
-    }
-
-    public FurnitureManager getFurnitureManager() {
-        return furnitureManager;
+    public BlockManager getBlockManager() {
+        return blockManager;
     }
 
     public String getPrefix() {
         return getConfig().getString("config.prefix");
+    }
+
+    public LoaderManager getLoaderManager() {
+        return loaderManager;
+    }
+
+    public FurnitureManager getFurnitureManager() {
+        return furnitureManager;
     }
 
     public static KatsuEngine getInstance() {

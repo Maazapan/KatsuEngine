@@ -1,14 +1,15 @@
 package io.github.maazapan.katsuengine.commands;
 
 import io.github.maazapan.katsuengine.KatsuEngine;
-import io.github.maazapan.katsuengine.engine.cosmetics.hats.manager.HatManager;
-import io.github.maazapan.katsuengine.engine.furniture.manager.FurnitureManager;
+import io.github.maazapan.katsuengine.engine.block.manager.BlockManager;
+import io.github.maazapan.katsuengine.engine.block.types.furnitures.gui.FurnitureGUI;
 import io.github.maazapan.katsuengine.utils.KatsuUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -26,9 +27,8 @@ public class KatsuCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        HatManager hatManager = plugin.getHatManager();
-        FurnitureManager furnitureManager = plugin.getFurnitureManager();
-
+        BlockManager blockManager = plugin.getBlockManager();
+        FileConfiguration config = plugin.getConfig();
 
         if (args.length > 0) {
             /*
@@ -44,7 +44,7 @@ public class KatsuCommand implements CommandExecutor, TabCompleter {
                             }
                             String id = args[2];
 
-                            if (!furnitureManager.getFurnitureMap().containsKey(id)) {
+                            if (!blockManager.getKatsuBlockMap().containsKey(id)) {
                                 sender.sendMessage(KatsuUtils.colored(plugin.getPrefix() + "&fThe furniture with id &e" + id + " &fdoes not exist."));
                                 return true;
                             }
@@ -56,66 +56,54 @@ public class KatsuCommand implements CommandExecutor, TabCompleter {
 
                             Player target = Bukkit.getPlayer(args[3]);
                             sender.sendMessage(KatsuUtils.colored(plugin.getPrefix() + "&fThe furniture with id &e" + id + " &fis now in player inventory."));
-                            target.getInventory().addItem(furnitureManager.getFurnitureItem(id));
-                            break;
-
-                        case "list":
+                            target.getInventory().addItem(blockManager.getKatsuBlock(id).getItemStack());
                             break;
 
                         case "menu":
+                            if (sender instanceof Player) {
+                                Player player = (Player) sender;
+                                new FurnitureGUI(player, plugin).addPages().init();
+                            }
                             break;
 
                         default:
-                            sender.sendMessage(KatsuUtils.colored(plugin.getPrefix() + "&fPlease use &e/katsu help &ffor help."));
-                            break;
-                    }
-                }
+                            if (sender instanceof Player) {
+                                Player player = (Player) sender;
+                                new FurnitureGUI(player, plugin).addPages().init();
 
-                /*
-                  - /katsu hat get <id> <player>
-                 */
-            } else if (args[0].equalsIgnoreCase("hat")) {
-                if (args.length > 1) {
-                    switch (args[1].toLowerCase()) {
-                        case "get":
-                            if (!(args.length > 3)) {
-                                sender.sendMessage(KatsuUtils.colored(plugin.getPrefix() + "&fPlease use &e/katsu hat get <id> <player>"));
-                                return true;
+                            } else {
+                                sender.sendMessage(KatsuUtils.colored(plugin.getPrefix() + "&fPlease use &e/katsu help &ffor help."));
                             }
-                            String id = args[2];
-
-                            if (!hatManager.getHatCosmeticMap().containsKey(id)) {
-                                sender.sendMessage(KatsuUtils.colored(plugin.getPrefix() + "&fThe hat with id &e" + id + " &fdoes not exist."));
-                                return true;
-                            }
-
-                            if (Bukkit.getPlayer(args[3]) == null) {
-                                sender.sendMessage(KatsuUtils.colored(plugin.getPrefix() + "&fThe player &e" + args[3] + " &fis not online on the server."));
-                                return true;
-                            }
-
-                            Player target = Bukkit.getPlayer(args[3]);
-                            sender.sendMessage(KatsuUtils.colored(plugin.getPrefix() + "&fThe hat with id &e" + id + " &fis now in player inventory."));
-                            target.getInventory().addItem(hatManager.getHatItemStackID(id));
                             break;
-
-                        case "list":
-                            break;
-
-                        case "menu":
-                            break;
-
-                        default:
-                            sender.sendMessage(KatsuUtils.colored(plugin.getPrefix() + "&fPlease use &e/katsu help &ffor help."));
-                            return true;
                     }
                 }
             } else if (args[0].equalsIgnoreCase("reload")) {
                 plugin.reloadConfig();
                 plugin.saveDefaultConfig();
-                furnitureManager.loadFurniture();
+
+                plugin.getLoaderManager().getFileManager().getBlocksYML().reload();
+                plugin.getLoaderManager().getFileManager().getBlocksYML().saveDefault();
+
+                blockManager.getKatsuBlockMap().clear();
+                blockManager.loadBlocks();
 
                 sender.sendMessage(KatsuUtils.colored(plugin.getPrefix() + "&fConfiguration is &esuccess &freloaded."));
+
+            } else if (args[0].equalsIgnoreCase("help")) {
+                List<String> listHelp = new ArrayList<>();
+
+                listHelp.add(" ");
+                listHelp.add("                  #FF1D1D&lKatsu Engine &8(&7 " + plugin.getDescription().getVersion() + "&8)");
+                listHelp.add(" ");
+                listHelp.add(" &8▸ &a✔ &8| &e/katsu reload &7: &fReload plugin configuration.");
+                listHelp.add(" &8▸ &a✔ &8| &e/katsu help &7: &fSee information about commands.");
+                listHelp.add(" &8▸ &a✔ &8| &e/katsu furniture get <id> <player> &7: &fGet furniture block.");
+                listHelp.add(" ");
+
+                listHelp.forEach(help -> sender.sendMessage(KatsuUtils.colored(help)));
+
+            } else {
+                sender.sendMessage(KatsuUtils.colored(plugin.getPrefix() + KatsuUtils.colored("&fPlease complete command use &e/katsu help")));
             }
         }
         return false;
@@ -124,13 +112,11 @@ public class KatsuCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
-        if (sender instanceof Player) {
-            List<String> commandsList = Arrays.asList("hat", "furniture", "help", "reload");
-            List<String> subCommands = Arrays.asList("get", "list", "menu");
+        if (sender instanceof Player && sender.isOp()) {
+            List<String> commandsList = Arrays.asList("furniture", "help", "reload");
+            List<String> subCommands = Arrays.asList("get", "menu");
 
-            List<String> availableHats = new ArrayList<>(plugin.getHatManager().getHatCosmeticMap().keySet());
-            List<String> availableFurniture = new ArrayList<>(plugin.getFurnitureManager().getFurnitureMap().keySet());
-
+            List<String> availableFurniture = new ArrayList<>(plugin.getBlockManager().getKatsuBlockMap().keySet());
             List<String> onlinePlayers = Bukkit.getOnlinePlayers().stream().map(Player::getName)
                                                  .collect(Collectors.toList());
 
@@ -138,9 +124,6 @@ public class KatsuCommand implements CommandExecutor, TabCompleter {
                 if (args[1].equalsIgnoreCase("get")) {
                     if (args.length > 3) {
                         return onlinePlayers;
-                    }
-                    if (args[0].equalsIgnoreCase("hat")) {
-                        return availableHats;
                     }
                     if (args[0].equalsIgnoreCase("furniture")) {
                         return availableFurniture;

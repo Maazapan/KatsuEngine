@@ -43,7 +43,7 @@ public class HatLoader {
                 nbtItem.applyNBT(itemStack);
 
                 HatCosmetic hatCosmetic = new HatCosmetic(id, itemStack);
-                plugin.getHatManager().getHatCosmeticMap().put(id, hatCosmetic);
+             //   plugin.getHatManager().getHatCosmeticMap().put(id, hatCosmetic);
             }
             plugin.getLogger().info("Cosmetics loaded successfully.");
 

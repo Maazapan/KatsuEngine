@@ -1,25 +1,18 @@
 package io.github.maazapan.katsuengine.listener;
 
-import de.tr7zw.changeme.nbtapi.NBTBlock;
-import de.tr7zw.changeme.nbtapi.NBTEntity;
 import de.tr7zw.changeme.nbtapi.NBTItem;
 import io.github.maazapan.katsuengine.KatsuEngine;
-import io.github.maazapan.katsuengine.engine.furniture.Furniture;
-import io.github.maazapan.katsuengine.engine.furniture.manager.FurnitureManager;
+import io.github.maazapan.katsuengine.manager.gui.GUI;
+import io.github.maazapan.katsuengine.utils.KatsuUtils;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.entity.ArmorStand;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.player.PlayerInteractAtEntityEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.ItemStack;
-import org.spigotmc.event.entity.EntityDismountEvent;
-
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerResourcePackStatusEvent;
+import org.bukkit.inventory.InventoryHolder;
 
 public class PlayerListener implements Listener {
 
@@ -30,92 +23,74 @@ public class PlayerListener implements Listener {
     }
 
     @EventHandler
-    public void onPlaceBlock(BlockPlaceEvent event) {
-        Player player = event.getPlayer();
-        Block block = event.getBlock();
-
-        FurnitureManager manager = plugin.getFurnitureManager();
-        ItemStack itemStackHand = event.getItemInHand();
-
-        if (itemStackHand.getType() != Material.AIR && !event.isCancelled()) {
-            NBTItem nbtItem = new NBTItem(itemStackHand);
-
-            if (nbtItem.hasKey("katsu_furniture")) {
-                manager.placeFurniture(nbtItem.getString("katsu_furniture"), player, block);
-            }
-            if (nbtItem.hasKey("katsu_hat")) {
-                event.setCancelled(true);
-            }
-        }
-    }
-
-    @EventHandler
-    public void onInteractBlock(PlayerInteractEvent event) {
+    public void onStatus(final PlayerResourcePackStatusEvent event) {
+        PlayerResourcePackStatusEvent.Status status = event.getStatus();
+        FileConfiguration config = plugin.getConfig();
         Player player = event.getPlayer();
 
-        if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
-            Block block = event.getClickedBlock();
-            NBTBlock nbtBlock = new NBTBlock(block);
-
-            FurnitureManager manager = plugin.getFurnitureManager();
-
-            if (nbtBlock.getData().hasKey("katsu_furniture") && !event.isCancelled()) {
-                manager.removeFurniture(block.getLocation(), block);
-                event.getClickedBlock().setType(Material.AIR);
-            }
-        }
-
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            Block block = event.getClickedBlock();
-            NBTBlock nbtBlock = new NBTBlock(block);
-
-            FurnitureManager manager = plugin.getFurnitureManager();
-
-            if (nbtBlock.getData().hasKey("katsu_furniture") && !event.isCancelled()) {
-                Furniture furniture = manager.getFurniture(nbtBlock.getData().getString("katsu_furniture"));
-
-                if (furniture.isChairEnabled() && block.getLocation().distance(player.getLocation()) < 3.0) {
-                    manager.chairBlock(player, block, furniture);
+        switch (status) {
+            /*
+             - Execute if the texture pack is downloaded correctly.
+             */
+            case SUCCESSFULLY_LOADED:
+                if (config.getBoolean("config.download-message")) {
+                    player.sendMessage(KatsuUtils.colored(plugin.getPrefix() + config.getString("messages.success-downloaded")));
                 }
+                break;
+            /*
+             - Execute if the player click on declined texture.
+             */
+            case DECLINED: {
+                if (config.getBoolean("config.resource-pack.force-pack")) {
+                    StringBuilder builder = new StringBuilder();
+
+                    for (String a : config.getStringList("messages.declined-texture-kick")) {
+                        builder.append(a).append("\n");
+                    }
+                    player.kickPlayer(KatsuUtils.colored(builder.toString()));
+                    return;
+                }
+                player.sendMessage(KatsuUtils.colored(plugin.getPrefix() + config.getString("messages.declined-texture")));
+            }
+            break;
+            /*
+             - Execute if the texture pack is bad.
+             */
+            case FAILED_DOWNLOAD:
+                player.sendMessage(KatsuUtils.colored(plugin.getPrefix() + config.getString("messages.failed-download")));
+                break;
+        }
+    }
+
+    @EventHandler
+    public void onPlayerJoin(final PlayerJoinEvent event) {
+        FileConfiguration config = plugin.getConfig();
+        Player player = event.getPlayer();
+
+        if (config.getBoolean("config.resource-pack.enable")) {
+            try {
+                player.setResourcePack(config.getString("config.resource-pack.resource-link"));
+
+            } catch (Exception exception) {
+                plugin.getLogger().warning("Ha occurred error download the texture pack.");
+                plugin.getLogger().warning("Make sure the link in the config is correct, the texture pack needs to be in .zip format.");
+                exception.printStackTrace();
             }
         }
     }
 
     @EventHandler
-    public void onDamageEntity(EntityDamageByEntityEvent event) {
-        if (event.getDamager() instanceof Player && event.getEntity() instanceof ArmorStand) {
-            ArmorStand armorStand = (ArmorStand) event.getEntity();
-            NBTEntity nbtEntity = new NBTEntity(armorStand);
+    public void onInventoryClick(InventoryClickEvent event) {
+        InventoryHolder holder = event.getInventory().getHolder();
 
-            if (nbtEntity.getPersistentDataContainer().hasKey("katsu_furniture") && !event.isCancelled()) {
-                event.setCancelled(true);
-            }
-        }
-    }
+        if (holder instanceof GUI) {
+            if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR) {
+                NBTItem nbtItem = new NBTItem(event.getCurrentItem());
 
-    @EventHandler
-    public void onPlayerInteractEntity(PlayerInteractAtEntityEvent event) {
-        if (event.getRightClicked() instanceof ArmorStand) {
-            ArmorStand armorStand = (ArmorStand) event.getRightClicked();
-            NBTEntity nbtEntity = new NBTEntity(armorStand);
+                GUI gui = (GUI) holder;
+                gui.handlerMenu(event);
 
-            if (nbtEntity.getPersistentDataContainer().hasKey("katsu_furniture") && !event.isCancelled()) {
-                event.setCancelled(true);
-            }
-        }
-    }
-
-    @EventHandler
-    public void onEntityDismount(EntityDismountEvent event) {
-        if (event.getDismounted() instanceof ArmorStand && event.getEntity() instanceof Player) {
-            Player player = (Player) event.getEntity();
-            ArmorStand armorStand = (ArmorStand) event.getDismounted();
-
-            NBTEntity nbtEntity = new NBTEntity(armorStand);
-
-            if (nbtEntity.getPersistentDataContainer().hasKey("katsu_chair")) {
-                armorStand.remove();
-                player.teleport(player.getLocation().add(0, 0.6, 0));
+                if (nbtItem.hasKey("mailbox-inventory-item")) event.setCancelled(true);
             }
         }
     }

@@ -1,46 +1,78 @@
+#############################################################################################
+  #      _  __          _                   _____                   _                     #
+  #     | |/ /   __ _  | |_   ___   _   _  | ____|  _ __     __ _  (_)  _ __     ___      #
+  #     | ' /   / _` | | __| / __| | | | | |  _|   | '_ \   / _` | | | | '_ \   / _ \     #
+  #     | . \  | (_| | | |_  \__ \ | |_| | | |___  | | | | | (_| | | | | | | | |  __/     #
+  #     |_|\_\  \__,_|  \__| |___/  \__,_| |_____| |_| |_|  \__, | |_| |_| |_|  \___|     #
+  #                                                         |___/                         #
+#############################################################################################
+#-                              *\ Created by Maazapan © /*                                -#
+#############################################################################################
 
 
 config:
+
+  # You can modify the prefix found in each of the commands
+  # simply by changing the text.
   prefix: "  &8▸ &a✔ &8| #FF1D1D&lKatsu &8:&r "
 
-  integrations:
-    world-guard:
-      enable: true
+  # Send a message that the texture pack has been
+  # downloaded when entering the server.
+  download-message: true
 
-    terra-generation:
-      enable: false
-      terra-worlds:
-        - "world"
+  resource-pack:
+    # By having this option activated, it will ask you to download a texture pack when you enter the server.
+    enable: true
+    # The player will have to have the texture pack downloaded to be able to play on the server
+    # if this option is deactivated he will be able to play without the texture pack.
+    force-pack: true
 
-      furniture-models:
-          example_furniture:
-            probability: 100
-            structure_key: katsu_example_furniture
+    # This is the link where the texture pack is located, you can download and edit it,
+    # remember the texture pack needs to be in a zip format, you can upload your texture pack to the following page for free.
+    # Texture Pack Host: https://mc-packs.net/
+    resource-link: "https://download.mc-packs.net/pack/5e4e97b75a0edbcf2a22656b5a8f0b5698875b0a.zip"
 
-          example_furniture_2:
-            probability: 50
-            structure_key: katsu_example_furniture_2
-cosmetics:
-  hat-cosmetic:
-    example_hat:
-      material: CARVED_PUMPKIN
-      custom_model_data: 1
-      display_name: "&fExample Hat"
-      lore:
-        - "&8KatsuEngine"
+  # This option allows you to have a distance that the player can use a chair.
+  chair-distance: 3.0
 
-furniture:
+messages:
+  success-downloaded: "&fThe texture pack has been downloaded &esuccessfully."
+  failed-download: "&cThere was an error downloading the texture pack."
+  declined-texture: "&cYou have not accepted the texture pack, you will not be able to see the custom blocks."
+  declined-texture-kick:
+    - "&a✔ &8| #FF1D1D&lKatsuEngine"
+    - ""
+    - "&fYou need download the texture pack"
+    - "&fto play in the server."
+    - ""
+    - '&7Make sure you have texture pack'
+    - '&8options enabled in your server list'
+    - ''
+    - "&e▸ &nClick on accept when enter the server."
 
-  # This is example first furniture
-  # you can create more furniture like this.
-  example_furniture:
-    rotate: true
-    furniture-chair:
-      enable: true
-      posY: -1.6
-    itemstack:
-      material: OAK_PLANKS
-      custom_model_data: 1
-      display_name: "&fExample Furniture"
-      lore:
-        - "&8KatsuEngine"
+inventorys:
+
+  furniture-gui:
+      title: "&8▸ Available Furniture"
+      items:
+        '1':
+          id: BARRIER
+          slot: 40
+          display_name: "&cClose Menu"
+          custom_model_data: 1
+        '3':
+          id: BARRIER
+          slot: 42
+          display_name: "#C2C2C2Next Page"
+          custom_model_data: 1
+        '4':
+          id: BARRIER
+          slot: 38
+          display_name: "#C2C2C2Old Page"
+          custom_model_data: 1
+        '2':
+          id: MAP
+          slot: 44
+          display_name: "&r "
+          custom_model_data: 1
+
