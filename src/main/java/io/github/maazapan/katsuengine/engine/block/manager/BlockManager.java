@@ -54,8 +54,8 @@ public class BlockManager {
      */
     public void registerRecipes() {
         List<KatsuBlock> furnitureList = katsuBlockMap.values().stream()
-                                                 .filter(furniture -> !furniture.getPatternRecipe().isEmpty() && !furniture.getRecipe().isEmpty())
-                                                 .collect(Collectors.toList());
+                .filter(furniture -> !furniture.getPatternRecipe().isEmpty() && !furniture.getRecipe().isEmpty())
+                .collect(Collectors.toList());
         try {
             for (KatsuBlock furniture : furnitureList) {
                 NamespacedKey key = new NamespacedKey(plugin, furniture.getId());
