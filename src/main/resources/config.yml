@@ -32,9 +32,6 @@ config:
     # Texture Pack Host: https://mc-packs.net/
     resource-link: "https://download.mc-packs.net/pack/5e4e97b75a0edbcf2a22656b5a8f0b5698875b0a.zip"
 
-  # This option allows you to have a distance that the player can use a chair.
-  chair-distance: 3.0
-
 messages:
   success-downloaded: "&fThe texture pack has been downloaded &esuccessfully."
   failed-download: "&cThere was an error downloading the texture pack."

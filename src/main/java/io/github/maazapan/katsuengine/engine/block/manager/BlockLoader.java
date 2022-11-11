@@ -2,8 +2,10 @@ package io.github.maazapan.katsuengine.engine.block.manager;
 
 import de.tr7zw.changeme.nbtapi.NBTItem;
 import io.github.maazapan.katsuengine.KatsuEngine;
-import io.github.maazapan.katsuengine.engine.block.CustomBlock;
+import io.github.maazapan.katsuengine.engine.block.KatsuBlock;
 import io.github.maazapan.katsuengine.engine.block.types.BlockType;
+import io.github.maazapan.katsuengine.engine.block.types.furnitures.FurnitureBlock;
+import io.github.maazapan.katsuengine.engine.block.types.normal.NormalBlock;
 import io.github.maazapan.katsuengine.utils.item.ItemBuilder;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -39,7 +41,7 @@ public class BlockLoader {
                     itemBuilder.setModelData(config.getInt("katsu_blocks." + id + ".itemstack.custom_model_data"));
                 }
 
-                CustomBlock katsuBlock = new CustomBlock(id);
+                KatsuBlock katsuBlock = blockType == BlockType.NORMAL ? new NormalBlock(id) : new FurnitureBlock(id);
                 katsuBlock.setType(blockType);
 
                 NBTItem nbtItem = new NBTItem(itemBuilder.toItemStack());
@@ -86,21 +88,18 @@ public class BlockLoader {
                     katsuBlock.setRecipe(recipeList);
                 }
 
-                /*
                 if (blockType == BlockType.FURNITURE) {
-                     FurnitureBlock furnitureBlock = new FurnitureBlock(id);
+                    FurnitureBlock furnitureBlock = (FurnitureBlock) katsuBlock;
 
                     if (config.isSet("katsu_blocks." + id + ".furniture_chair")) {
                         furnitureBlock.setChair(config.getBoolean("katsu_blocks." + id + ".furniture_chair.enable"));
                         furnitureBlock.setChairPosY(config.getDouble("furniture." + id + ".furniture_chair.posY"));
                     }
                     plugin.getBlockManager().getKatsuBlockMap().put(id, furnitureBlock);
-                    return;
-                }
-                plugin.getBlockManager().getKatsuBlockMap().put(id, katsuBlock);
 
-                 */
-                plugin.getBlockManager().getKatsuBlockMap().put(id, katsuBlock);
+                } else {
+                    plugin.getBlockManager().getKatsuBlockMap().put(id, katsuBlock);
+                }
             }
             plugin.getLogger().info("Success loaded " + plugin.getBlockManager().getKatsuBlockMap().values().size() + " custom blocks.");
 

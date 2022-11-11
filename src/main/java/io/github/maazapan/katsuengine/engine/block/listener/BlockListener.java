@@ -1,41 +1,28 @@
 package io.github.maazapan.katsuengine.engine.block.listener;
 
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.ProtocolManager;
-import com.comphenix.protocol.events.ListenerPriority;
-import com.comphenix.protocol.events.PacketAdapter;
-import com.comphenix.protocol.events.PacketContainer;
-import com.comphenix.protocol.events.PacketEvent;
-import com.comphenix.protocol.wrappers.EnumWrappers;
 import de.tr7zw.changeme.nbtapi.NBTBlock;
 import de.tr7zw.changeme.nbtapi.NBTItem;
 import io.github.maazapan.katsuengine.KatsuEngine;
 import io.github.maazapan.katsuengine.api.event.KatsuBlockInteractEvent;
 import io.github.maazapan.katsuengine.engine.block.KatsuBlock;
 import io.github.maazapan.katsuengine.engine.block.manager.BlockManager;
-import io.github.maazapan.katsuengine.engine.block.types.furnitures.manager.FurnitureManager;
-import io.github.maazapan.katsuengine.integrations.worldguard.WorldGuardHook;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Instrument;
+import org.bukkit.Material;
+import org.bukkit.Note;
 import org.bukkit.block.Block;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.NoteBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryCreativeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.RayTraceResult;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class BlockListener implements Listener {
 

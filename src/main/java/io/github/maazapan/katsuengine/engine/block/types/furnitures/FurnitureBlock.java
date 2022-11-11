@@ -1,18 +1,22 @@
 package io.github.maazapan.katsuengine.engine.block.types.furnitures;
 
-import io.github.maazapan.katsuengine.engine.block.CustomBlock;
+import io.github.maazapan.katsuengine.engine.block.KatsuBlock;
 import io.github.maazapan.katsuengine.engine.block.types.BlockType;
+import org.bukkit.Material;
 
-public class FurnitureBlock extends CustomBlock {
+public class FurnitureBlock extends KatsuBlock {
 
     private boolean chair;
     private double chairPosY;
 
+    private Material hitBlock;
+
     public FurnitureBlock(String id) {
         super(id);
+        this.setType(BlockType.FURNITURE);
+        this.hitBlock = Material.BARRIER;
         this.chairPosY = -1.6;
         this.chair = false;
-        this.setType(BlockType.FURNITURE);
     }
 
     public void setChair(boolean chair) {
@@ -29,6 +33,14 @@ public class FurnitureBlock extends CustomBlock {
 
     public double getChairPosY() {
         return chairPosY;
+    }
+
+    public void setHitBlock(Material hitBlock) {
+        this.hitBlock = hitBlock;
+    }
+
+    public Material getHitBlock() {
+        return hitBlock;
     }
 }
 

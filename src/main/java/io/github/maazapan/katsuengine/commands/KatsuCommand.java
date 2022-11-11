@@ -1,16 +1,13 @@
 package io.github.maazapan.katsuengine.commands;
 
-import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import io.github.maazapan.katsuengine.KatsuEngine;
 import io.github.maazapan.katsuengine.engine.block.manager.BlockManager;
-import io.github.maazapan.katsuengine.engine.block.types.furnitures.gui.FurnitureGUI;
 import io.github.maazapan.katsuengine.utils.KatsuUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -37,7 +34,7 @@ public class KatsuCommand implements CommandExecutor, TabCompleter {
              */
             if (args[0].equalsIgnoreCase("furniture")) {
                 if (!(args.length > 2)) {
-                    sender.sendMessage(KatsuUtils.colored(plugin.getPrefix() + "&fPlease use &e/katsu furniture get <id> <player>"));
+                    sender.sendMessage(KatsuUtils.colored(plugin.getPrefix() + "&fPlease use &e/katsu furniture <id> <player>"));
                     return true;
                 }
 

@@ -5,26 +5,20 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketContainer;
 import de.tr7zw.changeme.nbtapi.NBTBlock;
-import de.tr7zw.changeme.nbtapi.NBTEntity;
 import de.tr7zw.changeme.nbtapi.NBTItem;
 import io.github.maazapan.katsuengine.KatsuEngine;
 import io.github.maazapan.katsuengine.engine.block.KatsuBlock;
 import io.github.maazapan.katsuengine.engine.block.types.BlockType;
 import io.github.maazapan.katsuengine.engine.block.types.furnitures.FurnitureBlock;
-import io.github.maazapan.katsuengine.utils.KatsuUtils;
-import io.github.maazapan.katsuengine.utils.item.ItemBuilder;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -92,6 +86,12 @@ public class BlockManager {
         protocolManager.sendServerPacket(player, animation);
     }
 
+    public boolean isKatsuBlock(Block block) {
+        NBTBlock nbtBlock = new NBTBlock(block);
+        return nbtBlock.getData().hasKey("katsu_block");
+    }
+
+
     public Map<String, KatsuBlock> getKatsuBlockMap() {
         return katsuBlockMap;
     }
@@ -127,7 +127,7 @@ public class BlockManager {
                 return nbtItem.getString("katsu_id");
             }
         }
-        return null;
+        return "";
     }
 
     public FurnitureBlock getFurnitureBlock(String id) {

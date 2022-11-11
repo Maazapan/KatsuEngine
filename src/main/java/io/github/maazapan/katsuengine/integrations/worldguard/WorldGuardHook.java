@@ -47,4 +47,16 @@ public class WorldGuardHook {
         }
         return query.testBuild(BukkitAdapter.adapt(location), localPlayer, Flags.BLOCK_BREAK);
     }
+
+    public static boolean canInteract(Player player, Location location) {
+        LocalPlayer localPlayer = worldGuard.wrapPlayer(player);
+
+        RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
+        RegionQuery query = container.createQuery();
+
+        if (WorldGuard.getInstance().getPlatform().getSessionManager().hasBypass(localPlayer, BukkitAdapter.adapt(location.getWorld()))) {
+            return true;
+        }
+        return query.testBuild(BukkitAdapter.adapt(location), localPlayer, Flags.INTERACT);
+    }
 }

@@ -3,14 +3,19 @@ package io.github.maazapan.katsuengine.engine.block.types.furnitures.manager;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
-import com.comphenix.protocol.events.*;
+import com.comphenix.protocol.events.ListenerPriority;
+import com.comphenix.protocol.events.PacketAdapter;
+import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import de.tr7zw.changeme.nbtapi.NBTBlock;
 import de.tr7zw.changeme.nbtapi.NBTEntity;
 import de.tr7zw.changeme.nbtapi.NBTItem;
 import io.github.maazapan.katsuengine.KatsuEngine;
+import io.github.maazapan.katsuengine.api.event.KatsuBlockInteractEvent;
 import io.github.maazapan.katsuengine.engine.block.KatsuBlock;
 import io.github.maazapan.katsuengine.engine.block.manager.BlockManager;
+import io.github.maazapan.katsuengine.engine.block.types.furnitures.FurnitureBlock;
 import io.github.maazapan.katsuengine.integrations.worldguard.WorldGuardHook;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -28,7 +33,9 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 import org.spigotmc.event.entity.EntityDismountEvent;
@@ -58,9 +65,7 @@ public class FurnitureListener implements Listener {
         Player player = event.getPlayer();
         Block block = event.getBlock();
 
-        NBTBlock nbtBlock = new NBTBlock(block);
-
-        if (nbtBlock.getData().hasKey("katsu_block") && furnitureManager.isFurniture(block)) {
+        if (furnitureManager.isFurniture(block)) {
             if (WorldGuardHook.hasWorldGuard() && !WorldGuardHook.canBreak(player, block.getLocation())) return;
 
             if (!event.isCancelled()) {
@@ -76,10 +81,10 @@ public class FurnitureListener implements Listener {
      */
     @EventHandler
     public void onPlaceFurniture(PlayerInteractEvent event) {
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK && !event.isCancelled()) {
-            Block block = event.getClickedBlock();
+        if (event.getHand() == EquipmentSlot.HAND && event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             ItemStack itemStack = event.getItem();
             Player player = event.getPlayer();
+            Block block = event.getClickedBlock();
 
             /*
              - Check player is placing furniture block on ground.
@@ -87,11 +92,12 @@ public class FurnitureListener implements Listener {
             if (itemStack != null && itemStack.getType() != Material.AIR) {
                 if (WorldGuardHook.hasWorldGuard() && !WorldGuardHook.canPlace(player, block.getLocation())) return;
 
-                Block relative = block.getType().isSolid() ? block.getRelative(event.getBlockFace()) : event.getClickedBlock();
+                Block relative = block.getRelative(event.getBlockFace());
                 NBTItem nbtItem = new NBTItem(itemStack);
 
                 if (relative.getLocation().distance(player.getLocation().clone().add(0, 1.0, 0)) <= 1.4) return;
                 if (nbtItem.hasKey("katsu_block") && relative.getType() == Material.AIR && furnitureManager.isFurniture(itemStack)) {
+                    event.setCancelled(true);
 
                     furnitureManager.placeFurniture(nbtItem.getString("katsu_id"), player, relative);
                     blockManager.sendAnimation(player, event.getHand());
@@ -100,6 +106,23 @@ public class FurnitureListener implements Listener {
                         itemStack.setAmount(itemStack.getAmount() - 1);
                     }
                 }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onInteractFurniture(KatsuBlockInteractEvent event) {
+        Player player = event.getPlayer();
+        Block block = event.getBlock();
+        /*
+        - Check if the block is furniture and spawn chair if it is enabled.
+        */
+        if (furnitureManager.isFurniture(block)) {
+            if (WorldGuardHook.hasWorldGuard() && !WorldGuardHook.canInteract(player, block.getLocation())) return;
+            FurnitureBlock furnitureBlock = furnitureManager.getFurniture(block);
+
+            if (furnitureBlock.isChair()) {
+                furnitureManager.createChair(player, block);
             }
         }
     }
@@ -126,11 +149,11 @@ public class FurnitureListener implements Listener {
      * @param event PlayerInteractAtEntityEvent
      */
     @EventHandler
-    public void onPlayerInteractEntity(PlayerInteractAtEntityEvent event) {
+    public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
         if (event.getRightClicked() instanceof ItemFrame) {
             NBTEntity nbtEntity = new NBTEntity(event.getRightClicked());
 
-            if (nbtEntity.getPersistentDataContainer().hasKey("katsu_block") && !event.isCancelled()) {
+            if (nbtEntity.getPersistentDataContainer().hasKey("katsu_block")) {
                 event.setCancelled(true);
             }
         }
@@ -205,11 +228,11 @@ public class FurnitureListener implements Listener {
         if (event.getEntity() instanceof ItemFrame && event.getDamager() instanceof Player) {
             ItemFrame itemFrame = (ItemFrame) event.getEntity();
             Player player = (Player) event.getDamager();
-
             NBTEntity nbtEntity = new NBTEntity(itemFrame);
 
-            if (nbtEntity.getPersistentDataContainer().hasKey("katsu_furniture")) {
+            if (nbtEntity.getPersistentDataContainer().hasKey("katsu_block")) {
                 if (WorldGuardHook.hasWorldGuard() && !WorldGuardHook.canBreak(player, itemFrame.getLocation())) return;
+                event.setCancelled(true);
                 furnitureManager.removeFurniture(itemFrame, player);
             }
         }
@@ -266,7 +289,7 @@ public class FurnitureListener implements Listener {
                         }
 
                         if (digType == EnumWrappers.PlayerDigType.START_DESTROY_BLOCK) {
-                            BukkitTask task = Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> furnitureManager.removeFurniture(block, player), katsuBlock.getRemoveTime());
+                            BukkitTask task = Bukkit.getScheduler().runTaskLater(plugin, () -> furnitureManager.removeFurniture(block, player), katsuBlock.getRemoveTime());
                             taskMap.put(block, task);
                         }
                     }

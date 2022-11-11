@@ -7,6 +7,7 @@ import io.github.maazapan.katsuengine.KatsuEngine;
 import io.github.maazapan.katsuengine.engine.block.KatsuBlock;
 import io.github.maazapan.katsuengine.engine.block.manager.BlockManager;
 import io.github.maazapan.katsuengine.engine.block.types.BlockType;
+import io.github.maazapan.katsuengine.engine.block.types.furnitures.FurnitureBlock;
 import io.github.maazapan.katsuengine.utils.KatsuUtils;
 import io.github.maazapan.katsuengine.utils.item.ItemBuilder;
 import org.bukkit.*;
@@ -41,12 +42,15 @@ public class FurnitureManager {
         if (katsuBlock != null) {
             Location location = block.getLocation();
 
+            /*
             if (katsuBlock.getType() == BlockType.FURNITURE) {
                 block.setType(Material.BARRIER);
 
             } else if (katsuBlock.getType() == BlockType.STRING) {
                 block.setType(Material.TRIPWIRE);
             }
+
+             */
 
             /*
            - Set Custom nbt data at block.
@@ -181,6 +185,32 @@ public class FurnitureManager {
             }
         }
     }
+
+    public void createChair(Player player, Block block) {
+        FurnitureBlock furnitureBlock = getFurniture(block);
+
+        block.getWorld().spawn(KatsuUtils.centerLocation(block.getLocation().add(0, furnitureBlock.getChairPosY(), 0)), ArmorStand.class, (ArmorStand stand) -> {
+            NBTEntity nbtEntity = new NBTEntity(stand);
+            nbtEntity.getPersistentDataContainer().setString("katsu_chair", "chair");
+
+            stand.setVisible(false);
+            stand.setSmall(true);
+            stand.setBasePlate(false);
+            stand.setGravity(false);
+
+            stand.addPassenger(player);
+        });
+    }
+
+    public FurnitureBlock getFurniture(Block block) {
+        NBTBlock nbtBlock = new NBTBlock(block);
+
+        if (nbtBlock.getData().hasKey("katsu_block")) {
+            return (FurnitureBlock) blockManager.getKatsuBlock(nbtBlock.getData().getString("katsu_id"));
+        }
+        return null;
+    }
+
 
     public boolean isFurniture(ItemStack itemStack) {
         if (itemStack.getType() == Material.AIR) return false;
