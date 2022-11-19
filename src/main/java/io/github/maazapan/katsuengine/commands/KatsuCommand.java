@@ -114,13 +114,13 @@ public class KatsuCommand implements CommandExecutor, TabCompleter {
                     return true;
                 }
 
-                if (sender instanceof Player) {
-                    Player player = (Player) sender;
-                    new FurnitureGUI(player, plugin).addPages().init();
-
-                } else {
+                if (!(sender instanceof Player)) {
                     plugin.getLogger().info("You can't open the menu from the console.");
+                    return true;
                 }
+
+                Player player = (Player) sender;
+                new FurnitureGUI(player, plugin).addPages().init();
 
             } else {
                 sender.sendMessage(KatsuUtils.colored(plugin.getPrefix() + KatsuUtils.colored("&fPlease complete command use &e/katsu help")));
