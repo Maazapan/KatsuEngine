@@ -24,6 +24,7 @@ public abstract class KatsuBlock {
 
     private List<String> patternRecipe;
     private List<String> recipe;
+    private List<String> actions;
 
     public KatsuBlock(String id) {
         this.id = id;
@@ -32,6 +33,7 @@ public abstract class KatsuBlock {
         this.rotate = false;
         this.patternRecipe = new ArrayList<>();
         this.recipe = new ArrayList<>();
+        this.actions = new ArrayList<>();
     }
 
     public String getId() {
@@ -114,7 +116,15 @@ public abstract class KatsuBlock {
         return recipe;
     }
 
+    public List<String> getActions() {
+        return actions;
+    }
+
     public void setRecipe(List<String> recipe) {
         this.recipe = recipe;
+    }
+
+    public void setActions(List<String> actions) {
+        this.actions = actions;
     }
 }

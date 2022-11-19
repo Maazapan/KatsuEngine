@@ -20,6 +20,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
+import java.util.UUID;
 
 public class FurnitureManager {
 
@@ -42,7 +43,6 @@ public class FurnitureManager {
         if (katsuBlock != null) {
             Location location = block.getLocation();
 
-            /*
             if (katsuBlock.getType() == BlockType.FURNITURE) {
                 block.setType(Material.BARRIER);
 
@@ -50,14 +50,13 @@ public class FurnitureManager {
                 block.setType(Material.TRIPWIRE);
             }
 
-             */
-
             /*
            - Set Custom nbt data at block.
            */
             NBTBlock nbtBlock = new NBTBlock(block);
             nbtBlock.getData().setString("katsu_block", katsuBlock.getType().toString());
             nbtBlock.getData().setString("katsu_id", id);
+            nbtBlock.getData().setUUID("katsu_uuid", UUID.randomUUID());
 
             /*
              - Create item-frame and put the item in frame.
@@ -66,11 +65,13 @@ public class FurnitureManager {
                 NBTEntity nbtEntity = new NBTEntity(itemFrame);
                 nbtEntity.getPersistentDataContainer().setString("katsu_block", katsuBlock.getType().toString());
                 nbtEntity.getPersistentDataContainer().setString("katsu_id", id);
+                nbtEntity.getPersistentDataContainer().setFloat("katsu_yaw", player.getLocation().getYaw());
 
                 itemFrame.setVisible(false);
                 itemFrame.setFixed(false);
                 itemFrame.setPersistent(true);
                 itemFrame.setItemDropChance(0);
+                itemFrame.setSilent(true);
 
                 itemFrame.setFacingDirection(BlockFace.UP, true);
 
@@ -101,10 +102,15 @@ public class FurnitureManager {
 
         String furnitureID = nbtBlock.getData().getString("katsu_id");
         KatsuBlock katsuBlock = blockManager.getKatsuBlock(furnitureID);
+        ItemFrame itemFrame = KatsuUtils.getItemFrame(block.getLocation());
 
-        KatsuUtils.getItemFrame(block.getLocation()).remove();
+        if (itemFrame != null) {
+            itemFrame.remove();
+        }
+
         nbtBlock.getData().removeKey("katsu_block");
         nbtBlock.getData().removeKey("katsu_id");
+        nbtBlock.getData().removeKey("katsu_uuid");
 
         block.setType(Material.AIR);
 
@@ -186,20 +192,40 @@ public class FurnitureManager {
         }
     }
 
-    public void createChair(Player player, Block block) {
+    /**
+     * Create seat at block location and seat player.
+     *
+     * @param player Player
+     * @param block  Block
+     */
+    public void createSeat(Player player, Block block) {
         FurnitureBlock furnitureBlock = getFurniture(block);
+        ItemFrame itemFrame = KatsuUtils.getItemFrame(block.getLocation());
 
-        block.getWorld().spawn(KatsuUtils.centerLocation(block.getLocation().add(0, furnitureBlock.getChairPosY(), 0)), ArmorStand.class, (ArmorStand stand) -> {
-            NBTEntity nbtEntity = new NBTEntity(stand);
-            nbtEntity.getPersistentDataContainer().setString("katsu_chair", "chair");
+        if (itemFrame != null) {
+            NBTEntity nbtFrame = new NBTEntity(itemFrame);
+            float yaw = nbtFrame.getPersistentDataContainer().getFloat("katsu_yaw") + 180.0F;
 
-            stand.setVisible(false);
-            stand.setSmall(true);
-            stand.setBasePlate(false);
-            stand.setGravity(false);
+            Location location = KatsuUtils.centerLocation(block.getLocation().add(0, furnitureBlock.getSeatPosY(), 0));
+            location.setYaw(yaw);
 
-            stand.addPassenger(player);
-        });
+            player.teleport(location);
+
+            block.getWorld().spawn(location, ArmorStand.class, (ArmorStand stand) -> {
+                NBTEntity nbtEntity = new NBTEntity(stand);
+                nbtEntity.getPersistentDataContainer().setString("katsu_chair", "chair");
+
+                stand.setVisible(false);
+                stand.setSmall(true);
+                stand.setBasePlate(false);
+                stand.setGravity(false);
+                stand.setSilent(true);
+
+                stand.addPassenger(player);
+            });
+        } else {
+            removeFurniture(block, player);
+        }
     }
 
     public FurnitureBlock getFurniture(Block block) {
@@ -231,5 +257,9 @@ public class FurnitureManager {
             return katsuBlock.getType() != BlockType.NORMAL;
         }
         return false;
+    }
+
+    public BlockManager getBlockManager() {
+        return blockManager;
     }
 }

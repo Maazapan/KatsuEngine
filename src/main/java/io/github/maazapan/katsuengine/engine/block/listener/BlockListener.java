@@ -7,11 +7,8 @@ import io.github.maazapan.katsuengine.api.event.KatsuBlockInteractEvent;
 import io.github.maazapan.katsuengine.engine.block.KatsuBlock;
 import io.github.maazapan.katsuengine.engine.block.manager.BlockManager;
 import org.bukkit.Bukkit;
-import org.bukkit.Instrument;
 import org.bukkit.Material;
-import org.bukkit.Note;
 import org.bukkit.block.Block;
-import org.bukkit.block.data.type.NoteBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -36,15 +33,6 @@ public class BlockListener implements Listener {
     public void onPlace(BlockPlaceEvent event) {
         Block block = event.getBlockPlaced();
 
-        if (block.getType() == Material.NOTE_BLOCK) {
-            NoteBlock noteBlock = (NoteBlock) block.getBlockData();
-
-            noteBlock.setInstrument(Instrument.BASS_DRUM);
-            noteBlock.setPowered(false);
-            noteBlock.setNote(Note.flat(1, Note.Tone.E));
-
-            block.setBlockData(noteBlock);
-        }
     }
 
     /**

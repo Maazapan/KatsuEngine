@@ -92,8 +92,8 @@ public class BlockLoader {
                     FurnitureBlock furnitureBlock = (FurnitureBlock) katsuBlock;
 
                     if (config.isSet("katsu_blocks." + id + ".furniture_chair")) {
-                        furnitureBlock.setChair(config.getBoolean("katsu_blocks." + id + ".furniture_chair.enable"));
-                        furnitureBlock.setChairPosY(config.getDouble("furniture." + id + ".furniture_chair.posY"));
+                        furnitureBlock.setSeat(config.getBoolean("katsu_blocks." + id + ".furniture_chair.enable"));
+                        furnitureBlock.setSeatPosY(config.getDouble("katsu_blocks." + id + ".furniture_chair.posY"));
                     }
                     plugin.getBlockManager().getKatsuBlockMap().put(id, furnitureBlock);
 

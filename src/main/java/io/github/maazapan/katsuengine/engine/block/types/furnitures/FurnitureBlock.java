@@ -1,13 +1,15 @@
 package io.github.maazapan.katsuengine.engine.block.types.furnitures;
 
+import de.tr7zw.changeme.nbtapi.NBTBlock;
 import io.github.maazapan.katsuengine.engine.block.KatsuBlock;
 import io.github.maazapan.katsuengine.engine.block.types.BlockType;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 
 public class FurnitureBlock extends KatsuBlock {
 
-    private boolean chair;
-    private double chairPosY;
+    private boolean seat;
+    private double seatPosY;
 
     private Material hitBlock;
 
@@ -15,24 +17,24 @@ public class FurnitureBlock extends KatsuBlock {
         super(id);
         this.setType(BlockType.FURNITURE);
         this.hitBlock = Material.BARRIER;
-        this.chairPosY = -1.6;
-        this.chair = false;
+        this.seatPosY = -1.6;
+        this.seat = false;
     }
 
-    public void setChair(boolean chair) {
-        this.chair = chair;
+    public boolean isSeat() {
+        return seat;
     }
 
-    public boolean isChair() {
-        return chair;
+    public double getSeatPosY() {
+        return seatPosY;
     }
 
-    public void setChairPosY(double chairPosY) {
-        this.chairPosY = chairPosY;
+    public void setSeat(boolean seat) {
+        this.seat = seat;
     }
 
-    public double getChairPosY() {
-        return chairPosY;
+    public void setSeatPosY(double seatPosY) {
+        this.seatPosY = seatPosY;
     }
 
     public void setHitBlock(Material hitBlock) {
@@ -41,6 +43,9 @@ public class FurnitureBlock extends KatsuBlock {
 
     public Material getHitBlock() {
         return hitBlock;
+    }
+    public NBTBlock getNTBBlock(Block block) {
+        return new NBTBlock(block);
     }
 }
 

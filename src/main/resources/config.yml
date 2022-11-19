@@ -35,6 +35,7 @@ config:
 messages:
   success-downloaded: "&fThe texture pack has been downloaded &esuccessfully."
   failed-download: "&cThere was an error downloading the texture pack."
+  no-permission: "&cYou need &e%permission% &cpermission to execute this command."
   declined-texture: "&cYou have not accepted the texture pack, you will not be able to see the custom blocks."
   declined-texture-kick:
     - "&a✔ &8| #FF1D1D&lKatsuEngine"

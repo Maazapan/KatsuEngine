@@ -37,5 +37,6 @@ public class FileCreator extends YamlConfiguration {
 
     public void saveDefault() {
         plugin.saveResource(name, false);
+
     }
 }
