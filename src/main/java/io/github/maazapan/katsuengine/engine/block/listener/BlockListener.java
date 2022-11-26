@@ -29,12 +29,6 @@ public class BlockListener implements Listener {
         this.blockManager = plugin.getBlockManager();
     }
 
-    @EventHandler
-    public void onPlace(BlockPlaceEvent event) {
-        Block block = event.getBlockPlaced();
-
-    }
-
     /**
      * Check player is place custom furniture
      *

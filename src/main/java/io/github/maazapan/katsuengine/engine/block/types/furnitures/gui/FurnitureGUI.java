@@ -7,6 +7,7 @@ import io.github.maazapan.katsuengine.engine.block.manager.BlockManager;
 import io.github.maazapan.katsuengine.engine.block.types.furnitures.gui.page.PlayerPage;
 import io.github.maazapan.katsuengine.manager.gui.GUI;
 import io.github.maazapan.katsuengine.utils.item.ItemBuilder;
+import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -46,12 +47,7 @@ public class FurnitureGUI extends GUI {
 
             player.playSound(player.getLocation(), Sound.BLOCK_LEVER_CLICK, 1, 1);
 
-            actions.stream().forEach(action -> {
-                if (action.equalsIgnoreCase("[CLOSE]")) {
-                    player.closeInventory();
-                    return;
-                }
-
+            actions.forEach(action -> {
                 if (action.equalsIgnoreCase("[NEXT_PAGE]")) {
                     if (page.getPage() < getMaxPages()) {
                         page.setPage(page.getPage() + 1);
@@ -65,6 +61,11 @@ public class FurnitureGUI extends GUI {
                         page.setPage(page.getPage() - 1);
                         init();
                     }
+                    return;
+                }
+
+                if (action.equalsIgnoreCase("[CLOSE]")) {
+                    player.closeInventory();
                 }
             });
         }
@@ -79,9 +80,12 @@ public class FurnitureGUI extends GUI {
         PlayerPage page = playerPageMap.get(player.getUniqueId());
 
         int a = 0;
+
         for (int i = 36 * (page.getPage() - 1); i < furnitureList.size(); i++) {
             ItemBuilder itemBuilder = new ItemBuilder(furnitureList.get(i).getItemStack().clone());
-            itemBuilder.setLore("&8KatsuEngine", "", "&e▸ Click to get block ");
+
+            itemBuilder.setName("#FF1D1D" + ChatColor.stripColor(itemBuilder.getMeta().getDisplayName()));
+            itemBuilder.setLore("&8KatsuEngine", "", "&fID: &7" + furnitureList.get(i).getId(), " ", "&e▸ Click to get block ");
 
             NBTItem nbtItem = new NBTItem(itemBuilder.toItemStack());
             nbtItem.setString("katsu_furniture_item", furnitureList.get(i).getId());
@@ -89,8 +93,8 @@ public class FurnitureGUI extends GUI {
 
             getInventory().addItem(itemBuilder.toItemStack());
 
-
             a++;
+
             if (a > 35) {
                 break;
             }
@@ -112,10 +116,10 @@ public class FurnitureGUI extends GUI {
         BlockManager blockManager = plugin.getBlockManager();
         List<KatsuBlock> furnitureList = new ArrayList<>(blockManager.getKatsuBlockMap().values());
 
-        if (furnitureList.size() % 45 == 0) {
-            return furnitureList.size() / 45;
+        if (furnitureList.size() % 36 == 0) {
+            return furnitureList.size() / 36;
         }
-        return (furnitureList.size() / 45) + 1;
+        return (furnitureList.size() / 36) + 1;
     }
 
     public Map<UUID, PlayerPage> getPlayerPageMap() {

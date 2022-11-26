@@ -45,9 +45,9 @@ public class KatsuUtils {
     public static ItemFrame getItemFrame(Location location) {
         for (Entity entity : location.getWorld().getNearbyEntities(location, 1, 1, 1)) {
             if (entity instanceof ItemFrame
-                        && entity.getLocation().getBlockX() == location.getBlockX()
-                        && entity.getLocation().getBlockY() == location.getBlockY()
-                        && entity.getLocation().getBlockZ() == location.getBlockZ()) {
+                    && entity.getLocation().getBlockX() == location.getBlockX()
+                    && entity.getLocation().getBlockY() == location.getBlockY()
+                    && entity.getLocation().getBlockZ() == location.getBlockZ()) {
                 NBTEntity nbt = new NBTEntity(entity);
                 return nbt.getPersistentDataContainer().hasKey("katsu_block") ? (ItemFrame) entity : null;
             }
@@ -55,13 +55,14 @@ public class KatsuUtils {
         return null;
     }
 
-    public static ArmorStand getStandChair(Location location) {
-        for (Entity entity : location.getWorld().getNearbyEntities(location, 1, 1, 1)) {
+    public static ArmorStand getFurnitureSeat(Location location) {
+        for (Entity entity : location.getWorld().getNearbyEntities(location, 5, 5, 5)) {
             if (entity instanceof ArmorStand) {
                 NBTEntity nbt = new NBTEntity(entity);
 
-                // nbt.getPersistentDataContainer().hasKey("katsu_chair") ? (ArmorStand) entity : null
-                return (ArmorStand) entity;
+                if (nbt.getPersistentDataContainer().hasKey("katsu_chair")) {
+                    return (ArmorStand) entity;
+                }
             }
         }
         return null;

@@ -31,7 +31,7 @@ katsu_blocks:
 
   # This is example first chair
   # you can create more furniture like this.
-  example_chair:
+  example_wood_seat:
     block_type: FURNITURE
     rotate: true
     removeTime: 20
@@ -40,6 +40,7 @@ katsu_blocks:
       place: BLOCK_WOOD_PLACE;10;1
     particles: OAK_PLANKS;25;0.3;0.3;0.3
 
+    # Adding new furniture recipe at game.
     craft_recipe:
       craft_permission: "katsuengine.example_chair"
       pattern:
@@ -50,13 +51,50 @@ katsu_blocks:
         'E': OAK_PLANKS
         'A': OAK_SLAB
         'B': LIME_WOOL
-    furniture_chair:
+
+    furniture_seat:
       enable: true
-      posY: -1.6
+      posY: -0.95
 
     itemstack:
       material: GRAY_DYE
       custom_model_data: 2
       display_name: "&fExample Chair"
+      lore:
+        - "&8KatsuEngine"
+
+  example_wool_seat:
+    block_type: FURNITURE
+    rotate: true
+    removeTime: 10
+    sounds:
+      break: BLOCK_WOOL_BREAK;10;1
+      place: BLOCK_WOOL_PLACE;10;1
+    particles: RED_WOOL;25;0.3;0.3;0.3
+    furniture_seat:
+      enable: true
+      posY: -0.80
+
+    itemstack:
+      material: GRAY_DYE
+      custom_model_data: 5
+      display_name: "&fWool Seat"
+      lore:
+        - "&8KatsuEngine"
+
+  example_hit_block:
+    block_type: FURNITURE
+    hit_block: TRIPWIRE
+    rotate: true
+    removeTime: 10
+    sounds:
+      break: BLOCK_STONE_BREAK;10;1
+      place: BLOCK_STONE_PLACE;10;1
+    particles: STONE;10;0.3;0.3;0.3
+
+    itemstack:
+      material: GRAY_DYE
+      custom_model_data: 3
+      display_name: "&fRock"
       lore:
         - "&8KatsuEngine"

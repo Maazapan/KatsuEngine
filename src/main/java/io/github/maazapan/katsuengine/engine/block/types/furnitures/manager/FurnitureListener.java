@@ -100,6 +100,7 @@ public class FurnitureListener implements Listener {
             if (itemStack != null && itemStack.getType() != Material.AIR && block != null) {
                 if (WorldGuardHook.hasWorldGuard() && !WorldGuardHook.canPlace(player, block.getLocation())) return;
 
+                if (furnitureManager.isSeat(block) && !player.isSneaking()) return;
                 Block relative = block.isPassable() ? block : block.getRelative(event.getBlockFace());
                 NBTItem nbtItem = new NBTItem(itemStack);
 
@@ -135,8 +136,12 @@ public class FurnitureListener implements Listener {
             FurnitureBlock furnitureBlock = furnitureManager.getFurniture(block);
 
             if (furnitureBlock.isSeat() && !player.isSneaking() && player.getVehicle() == null) {
-                event.setCancelled(true);
-                furnitureManager.createSeat(player, block);
+                NBTBlock nbtBlock = new NBTBlock(block);
+
+                if (!furnitureManager.isNearbySeat(block.getLocation(), nbtBlock.getData().getUUID("katsu_uuid"))) {
+                    event.setCancelled(true);
+                    furnitureManager.createSeat(player, block);
+                }
             }
         }
     }
@@ -187,7 +192,7 @@ public class FurnitureListener implements Listener {
             NBTEntity nbtEntity = new NBTEntity(armorStand);
 
             if (nbtEntity.getPersistentDataContainer().hasKey("katsu_chair")) {
-                Location location = armorStand.getLocation().add(0,1.0D,0)
+                Location location = armorStand.getLocation().add(0, 1.0D, 0)
                         .add(armorStand.getLocation().getDirection().multiply(1.0));
 
                 player.teleport(location);

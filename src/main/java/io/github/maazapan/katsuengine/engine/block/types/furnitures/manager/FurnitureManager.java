@@ -10,6 +10,8 @@ import io.github.maazapan.katsuengine.engine.block.types.BlockType;
 import io.github.maazapan.katsuengine.engine.block.types.furnitures.FurnitureBlock;
 import io.github.maazapan.katsuengine.utils.KatsuUtils;
 import io.github.maazapan.katsuengine.utils.item.ItemBuilder;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -38,17 +40,12 @@ public class FurnitureManager {
      * @param id The id of the furniture.
      */
     public void placeFurniture(String id, Player player, Block block) {
-        KatsuBlock katsuBlock = blockManager.getKatsuBlock(id);
+        FurnitureBlock katsuBlock = blockManager.getFurnitureBlock(id);
 
         if (katsuBlock != null) {
             Location location = block.getLocation();
 
-            if (katsuBlock.getType() == BlockType.FURNITURE) {
-                block.setType(Material.BARRIER);
-
-            } else if (katsuBlock.getType() == BlockType.STRING) {
-                block.setType(Material.TRIPWIRE);
-            }
+            block.setType(katsuBlock.getHitBlock());
 
             /*
            - Set Custom nbt data at block.
@@ -108,6 +105,11 @@ public class FurnitureManager {
             itemFrame.remove();
         }
 
+        if (isNearbySeat(block.getLocation(), nbtBlock.getData().getUUID("katsu_uuid"))) {
+            ArmorStand armorStand = getNearbySeat(block.getLocation(), nbtBlock.getData().getUUID("katsu_uuid"));
+            armorStand.remove();
+        }
+
         nbtBlock.getData().removeKey("katsu_block");
         nbtBlock.getData().removeKey("katsu_id");
         nbtBlock.getData().removeKey("katsu_uuid");
@@ -137,11 +139,6 @@ public class FurnitureManager {
                     return;
                 }
                 player.getWorld().spawnParticle(Particle.valueOf(particle[0]), KatsuUtils.centerLocation(block.getLocation()), amount, x, y, z);
-            }
-
-            if (KatsuUtils.getStandChair(block.getLocation()) != null) {
-                ArmorStand armorStand = KatsuUtils.getStandChair(block.getLocation());
-                armorStand.remove();
             }
         }
     }
@@ -185,9 +182,8 @@ public class FurnitureManager {
                 player.getWorld().spawnParticle(Particle.valueOf(particle[0]), entity.getLocation(), amount, x, y, z);
             }
 
-            if (KatsuUtils.getStandChair(entity.getLocation()) != null) {
-                ArmorStand armorStand = KatsuUtils.getStandChair(entity.getLocation());
-                armorStand.remove();
+            if (KatsuUtils.getFurnitureSeat(entity.getLocation()) != null) {
+                System.out.println("Encontrado...");
             }
         }
     }
@@ -213,7 +209,10 @@ public class FurnitureManager {
 
             block.getWorld().spawn(location, ArmorStand.class, (ArmorStand stand) -> {
                 NBTEntity nbtEntity = new NBTEntity(stand);
+                NBTBlock nbtBlock = new NBTBlock(block);
+
                 nbtEntity.getPersistentDataContainer().setString("katsu_chair", "chair");
+                nbtEntity.getPersistentDataContainer().setUUID("katsu_uuid", nbtBlock.getData().getUUID("katsu_uuid"));
 
                 stand.setVisible(false);
                 stand.setSmall(true);
@@ -226,6 +225,40 @@ public class FurnitureManager {
         } else {
             removeFurniture(block, player);
         }
+    }
+
+
+    public boolean isSeat(Block block) {
+        FurnitureBlock furnitureBlock = getFurniture(block);
+
+        if (furnitureBlock != null) {
+            return furnitureBlock.isSeat();
+        }
+        return false;
+    }
+
+    public boolean isNearbySeat(Location location, UUID uuid) {
+        if (KatsuUtils.getFurnitureSeat(location) != null) {
+            ArmorStand armorStand = KatsuUtils.getFurnitureSeat(location);
+            assert armorStand != null;
+            NBTEntity nbtEntity = new NBTEntity(armorStand);
+
+            return nbtEntity.getPersistentDataContainer().getUUID("katsu_uuid").equals(uuid);
+        }
+        return false;
+    }
+
+    public ArmorStand getNearbySeat(Location location, UUID uuid) {
+        if (KatsuUtils.getFurnitureSeat(location) != null) {
+            ArmorStand armorStand = KatsuUtils.getFurnitureSeat(location);
+            assert armorStand != null;
+            NBTEntity nbtEntity = new NBTEntity(armorStand);
+
+            if (nbtEntity.getPersistentDataContainer().getUUID("katsu_uuid").equals(uuid)) {
+                return armorStand;
+            }
+        }
+        return null;
     }
 
     public FurnitureBlock getFurniture(Block block) {
